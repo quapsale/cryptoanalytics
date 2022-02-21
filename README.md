@@ -4,7 +4,7 @@ Cryptocoins Analytics is a Python project for the analysis of cryptocurrency tre
 
 
 ## Data
-The data source used to gather information about cryptocurenncy trends is [CoinMarketCap](https://coinmarketcap.com/).
+The data source used to gather information about cryptocurrency trends is [CoinMarketCap](https://coinmarketcap.com/).
 The script to generate the raw dataset (raw_data_pull.py) will extract historical information about prices, volumes and 
 market cap of a pre-specified set of coins for a determined time frame.
 
