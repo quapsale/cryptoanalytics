@@ -1,6 +1,6 @@
-# Cryptocoins Analytics
+# CryptoAnalytics
 
-Cryptocoins Analytics is a Python project for the analysis of cryptocurrency trends.
+CryptoAnalytics is a Python project for the analysis of cryptocurrency trends.
 
 
 ## Data
