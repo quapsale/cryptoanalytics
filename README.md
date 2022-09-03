@@ -44,7 +44,7 @@ Liu, “LightGBM: A Highly Efficient Gradient Boosting Decision Tree,”
 in NIPS’17. </i></li>
 
 <li> <i> T. Chen and C. Guestrin, “XGBoost: A Scalable Tree Boosting System,”
-in ACM SIGKDD 201. </i></li>
+in ACM SIGKDD 2016. </i></li>
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
