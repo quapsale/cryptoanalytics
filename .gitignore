@@ -18,8 +18,5 @@
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
 
-# Requirements
-requirements.txt
-
 # Venv
 venv
