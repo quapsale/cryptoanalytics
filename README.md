@@ -14,8 +14,7 @@ This repository is organized as it follows:
 
 ## Data
 The data sources used to gather information about cryptocurrency trends are [CoinMarketCap](https://www.coinmarketcap.com/) and [Binance](https://www.binance.com/).
-The two pre-built datasets (coinmarketcap.csv and binance.csv) are available in a compressed .zip format. A script to generate the Coinmarketcap dataset (coinmarketcap_data_pull.py) is also made available. It will extract historical information about prices, volumes and 
-market cap of a pre-determined set of coins for a user-specified time frame.
+The two pre-built datasets (coinmarketcap.csv and binance.csv) are available in a compressed .zip format.
 
 ## Getting Started
 The Python version used in this project is 3.9. The R version is 3.6. A list of the external Python libraries/dependencies can be found in the file requirements.txt.
