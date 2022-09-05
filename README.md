@@ -10,7 +10,7 @@ This repository is organized as it follows:
 <li> Implement the Toda-Yamamoto procedure to test for Granger-causality between correlated cryptocoins.</li>
 <li> Train and test SOTA machine learning models to forecast cryptocoin price series (namely GRU, LSTM, CatBoost, LightGBM and XGBoost).</li>
 </ul>
-<li><b>Data:</b> pre-built datasets adopted in the above-mentioned analyses. </li>
+<li><b>Data:</b> pre-built datasets adopted in the above-mentioned analyses, spanning 27 months from 13/03/2020 to 22/06/2022. </li>
 
 ## Data
 The data sources used to gather information about cryptocurrency trends are [CoinMarketCap](https://www.coinmarketcap.com/) and [Binance](https://www.binance.com/).
