@@ -19,7 +19,7 @@ source venv/bin/activate
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the project requirements as it follows.
 
 ```bash
-pip freeze > requirements.txt
+pip install -r requirements.txt
 ```
 
 ## CLI Structure
