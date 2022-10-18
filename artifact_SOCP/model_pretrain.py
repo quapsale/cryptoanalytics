@@ -12,6 +12,7 @@ import sys
 import pandas as pd
 import json
 import torch
+from datetime import datetime
 from sklearn.preprocessing import MinMaxScaler
 from pretrain.datasets import DatasetV1
 from torch.utils.data import DataLoader
@@ -36,18 +37,16 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 parser = argparse.ArgumentParser(description='pretrain ML models for crypto-coins forecast')
 
 # Train
-parser.add_argument('-tr', '--train', type=str, nargs='?', default=os.path.join(os.getcwd(), 'train.csv'),
-                    help='path to the csv training dataset (default is current directory)')
+parser.add_argument('-tr', '--train', type=str, nargs=1, help='path to the csv training dataset')
 
 # Valid
-parser.add_argument('-vd', '--valid', type=str, nargs='?', default=os.path.join(os.getcwd(), 'valid.csv'),
-                    help='path to the csv valid dataset (default is current directory)')
+parser.add_argument('-vd', '--valid', type=str, nargs=1, help='path to the csv valid dataset')
 
 # Target
 parser.add_argument('-t', '--target', type=str, nargs=1, help='target coin to predict')
 
 # Features
-parser.add_argument('-f', '--features', type=str, nargs='?',
+parser.add_argument('-ft', '--features', type=str, nargs='?',
                     help='path for json with feature variable list (default are all coins)')
 
 # Model
@@ -61,6 +60,10 @@ parser.add_argument('-c', '--config', type=str, nargs=1,
 parser.add_argument('-p', '--path', type=str, nargs='?', default=os.getcwd(),
                     help='path for saving the pretrained model (default is current directory)')
 
+# Filename
+parser.add_argument('-f', '--filename', type=str, nargs='?',
+                    help='filename for model (default is model_TODAY)')
+
 # Arg parse
 args = parser.parse_args()
 
@@ -70,6 +73,16 @@ gpus = 1 if torch.cuda.is_available() else 0
 # Exception (invalid path)
 if not (os.path.exists(args.path)):
     print('Invalid path provided: folder does not exist!')
+    sys.exit(1)
+
+# Validate train
+if not args.train:
+    print('Missing argument: --train is required!')
+    sys.exit(1)
+
+# Validate valid
+if not args.valid:
+    print('Missing argument: --valid is required!')
     sys.exit(1)
 
 # Validate config
@@ -91,6 +104,22 @@ if not args.model:
 (target,) = args.target
 (conf,) = args.config
 (mdl,) = args.model
+(train,) = args.train
+(valid,) = args.valid
+
+# Validate filename
+if not args.filename:
+    now = datetime.now()
+    today = datetime.strftime(now, '%d-%m-%Y')
+    filename = mdl + '_' + today
+    filename = filename.replace('-', '')
+
+else:
+    filename = args.filename
+
+# Print args
+print({'--train': train, '--valid': valid, '--target': target, '--features': args.features,
+       '--config': conf, '--model': mdl,  '--path': args.path, '--filename': filename})
 
 try:
     f = open(conf)
@@ -98,8 +127,8 @@ try:
 
     # Pretrain
     try:
-        train = pd.read_csv(args.train, sep='\t')
-        valid = pd.read_csv(args.valid, sep='\t')
+        train = pd.read_csv(train, sep=',')
+        valid = pd.read_csv(valid, sep=',')
 
         try:
             train['Date'] = pd.to_datetime(train['Date'])
@@ -149,8 +178,8 @@ try:
 
                         # GRU
                         if mdl == 'gru':
-                            if os.path.exists(os.path.join(args.path, 'gru.ckpt')):
-                                print('A file gru.ckpt already exists, please remove the old checkpoint '
+                            if os.path.exists(os.path.join(args.path, filename + '.ckpt')):
+                                print('A file ckpt already exists, please remove the old checkpoint '
                                       'before storing a new model.')
                                 sys.exit(1)
 
@@ -175,7 +204,7 @@ try:
 
                                 # Callbacks
                                 early_stopping = EarlyStopping('val_loss', patience=patience)
-                                checkpoint = ModelCheckpoint(args.path, filename='gru',
+                                checkpoint = ModelCheckpoint(args.path, filename=filename,
                                                              monitor='val_loss', mode='min')
 
                                 # GRU and trainer
@@ -194,8 +223,8 @@ try:
 
                         # LSTM
                         elif mdl == 'lstm':
-                            if os.path.exists(os.path.join(args.path, 'lstm.ckpt')):
-                                print('A file lstm.ckpt already exists, please remove the old checkpoint '
+                            if os.path.exists(os.path.join(args.path, filename + '.ckpt')):
+                                print('A file ckpt already exists, please remove the old checkpoint '
                                       'before storing a new model.')
                                 sys.exit(1)
 
@@ -220,7 +249,7 @@ try:
 
                                 # Callbacks
                                 early_stopping = EarlyStopping('val_loss', patience=patience)
-                                checkpoint = ModelCheckpoint(args.path, filename='lstm',
+                                checkpoint = ModelCheckpoint(args.path, filename=filename,
                                                              monitor='val_loss', mode='min')
 
                                 # LSTM and trainer
@@ -240,8 +269,8 @@ try:
                         # XGBoost
                         elif mdl == 'xgboost':
 
-                            if os.path.exists(os.path.join(args.path, 'xgboost.txt')):
-                                print('A file xgboost.txt already exists, please remove the old checkpoint '
+                            if os.path.exists(os.path.join(args.path, filename + '.txt')):
+                                print('A file .txt already exists, please remove the old checkpoint '
                                       'before storing a new model.')
                                 sys.exit(1)
 
@@ -264,7 +293,7 @@ try:
                                           early_stopping_rounds=patience)
 
                                 # Save pretrained XGBoost
-                                file_path = os.path.join(args.path, 'xgboost.txt')
+                                file_path = os.path.join(args.path, filename + '.txt')
                                 model.save_model(file_path)
 
                             # Exception: bad formatted json
@@ -274,8 +303,8 @@ try:
 
                         # LightGBM
                         elif mdl == 'lightgbm':
-                            if os.path.exists(os.path.join(args.path, 'lightgbm.txt')):
-                                print('A file lightgbm.txt already exists, please remove the old checkpoint '
+                            if os.path.exists(os.path.join(args.path, filename + '.txt')):
+                                print('A file .txt already exists, please remove the old checkpoint '
                                       'before storing a new model.')
                                 sys.exit(1)
 
@@ -299,7 +328,7 @@ try:
                                           eval_metric='rmse')
 
                                 # Save pretrained LightGBM
-                                file_path = os.path.join(args.path, 'lightgbm.txt')
+                                file_path = os.path.join(args.path, filename + '.txt')
                                 model.booster_.save_model(file_path, num_iteration=model.booster_.best_iteration)
 
                             # Exception: bad formatted json
@@ -309,8 +338,8 @@ try:
 
                         # Catboost
                         elif mdl == 'catboost':
-                            if os.path.exists(os.path.join(args.path, 'catboost.txt')):
-                                print('A file catboost.txt already exists, please remove the old checkpoint '
+                            if os.path.exists(os.path.join(args.path, filename + '.txt')):
+                                print('A file .txt already exists, please remove the old checkpoint '
                                       'before storing a new model.')
                                 sys.exit(1)
 
@@ -333,7 +362,7 @@ try:
                                           early_stopping_rounds=patience, use_best_model=True)
 
                                 # Save pretrained LightGBM
-                                file_path = os.path.join(args.path, 'catboost.txt')
+                                file_path = os.path.join(args.path, filename + '.txt')
                                 model.save_model(file_path)
 
                             # Exception: bad formatted json
@@ -372,8 +401,8 @@ try:
 
             # GRU
             if mdl == 'gru':
-                if os.path.exists(os.path.join(args.path, 'gru.ckpt')):
-                    print('A file gru.ckpt already exists, please remove the old checkpoint '
+                if os.path.exists(os.path.join(args.path, filename + '.ckpt')):
+                    print('A file .ckpt already exists, please remove the old checkpoint '
                           'before storing a new model.')
                     sys.exit(1)
 
@@ -398,7 +427,7 @@ try:
 
                     # Callbacks
                     early_stopping = EarlyStopping('val_loss', patience=patience)
-                    checkpoint = ModelCheckpoint(args.path, filename='gru',
+                    checkpoint = ModelCheckpoint(args.path, filename=filename,
                                                  monitor='val_loss', mode='min')
 
                     # GRU and trainer
@@ -417,8 +446,8 @@ try:
 
             # LSTM
             elif mdl == 'lstm':
-                if os.path.exists(os.path.join(args.path, 'lstm.ckpt')):
-                    print('A file lstm.ckpt already exists, please remove the old checkpoint '
+                if os.path.exists(os.path.join(args.path, filename + '.ckpt')):
+                    print('A file .ckpt already exists, please remove the old checkpoint '
                           'before storing a new model.')
                     sys.exit(1)
 
@@ -443,7 +472,7 @@ try:
 
                     # Callbacks
                     early_stopping = EarlyStopping('val_loss', patience=patience)
-                    checkpoint = ModelCheckpoint(args.path, filename='lstm',
+                    checkpoint = ModelCheckpoint(args.path, filename=filename,
                                                  monitor='val_loss', mode='min')
 
                     # LSTM and trainer
@@ -462,8 +491,8 @@ try:
 
             # XGBoost
             elif mdl == 'xgboost':
-                if os.path.exists(os.path.join(args.path, 'xgboost.txt')):
-                    print('A file xgboost.txt already exists, please remove the old checkpoint '
+                if os.path.exists(os.path.join(args.path, filename + '.txt')):
+                    print('A file .txt already exists, please remove the old checkpoint '
                           'before storing a new model.')
                     sys.exit(1)
 
@@ -486,7 +515,7 @@ try:
                               early_stopping_rounds=patience)
 
                     # Save pretrained XGBoost
-                    file_path = os.path.join(args.path, 'xgboost.txt')
+                    file_path = os.path.join(args.path, filename + '.txt')
                     model.save_model(file_path)
 
                 # Exception: bad formatted json
@@ -496,8 +525,8 @@ try:
 
             # LightGBM
             elif mdl == 'lightgbm':
-                if os.path.exists(os.path.join(args.path, 'lightgbm.txt')):
-                    print('A file lightgbm.txt already exists, please remove the old checkpoint '
+                if os.path.exists(os.path.join(args.path, filename + '.txt')):
+                    print('A file .txt already exists, please remove the old checkpoint '
                           'before storing a new model.')
                     sys.exit(1)
 
@@ -521,7 +550,7 @@ try:
                               eval_metric='rmse')
 
                     # Save pretrained LightGBM
-                    file_path = os.path.join(args.path, 'lightgbm.txt')
+                    file_path = os.path.join(args.path, filename + '.txt')
                     model.booster_.save_model(file_path)
 
                 # Exception: bad formatted json
@@ -531,8 +560,8 @@ try:
 
             # Catboost
             elif mdl == 'catboost':
-                if os.path.exists(os.path.join(args.path, 'catboost.txt')):
-                    print('A file catboost.txt already exists, please remove the old checkpoint '
+                if os.path.exists(os.path.join(args.path, filename + '.txt')):
+                    print('A file .txt already exists, please remove the old checkpoint '
                           'before storing a new model.')
                     sys.exit(1)
 
@@ -555,7 +584,7 @@ try:
                               early_stopping_rounds=patience, use_best_model=True)
 
                     # Save pretrained LightGBM
-                    file_path = os.path.join(args.path, 'catboost.txt')
+                    file_path = os.path.join(args.path, filename + '.txt')
                     model.save_model(file_path)
 
                 # Exception: bad formatted json

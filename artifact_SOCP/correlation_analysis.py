@@ -9,15 +9,15 @@ Python Version: 3.9
 # Imports
 import os
 import argparse
+from datetime import datetime
 import sys
 import pandas as pd
 
 # Parser for CLI
 parser = argparse.ArgumentParser(description='compute correlations between coin prices (avg ohlc or close)')
 
-# Path
-parser.add_argument('-d', '--data', type=str, nargs='?', default=os.path.join(os.getcwd(), 'dataset_coinmarketcap.csv'),
-                    help='path to the csv dataset (default is current directory)')
+# Data
+parser.add_argument('-d', '--data', type=str, nargs=1, help='path to the csv dataset')
 
 # Variable
 parser.add_argument('-v', '--variable', type=str, nargs='?', default='avg_ohlc',
@@ -35,6 +35,10 @@ parser.add_argument('-m', '--method', type=str, nargs='?', default='pearson',
 parser.add_argument('-p', '--path', type=str, nargs='?', default=os.getcwd(),
                     help='path for saving the correlation dataset (default is current directory)')
 
+# Filename
+parser.add_argument('-f', '--filename', type=str, nargs='?',
+                    help='filename for dataset (default is correlations_TODAY)')
+
 # Arg parse
 args = parser.parse_args()
 
@@ -43,9 +47,30 @@ if not os.path.exists(args.path):
     print('Invalid path provided: destination does not exist!')
     sys.exit(1)
 
+# Validate data
+if not args.data:
+    print('Missing argument: --data is required!')
+    sys.exit(1)
+
+(data,) = args.data
+
+# Validate filename
+if not args.filename:
+    now = datetime.now()
+    today = datetime.strftime(now, '%d-%m-%Y')
+    filename = 'correlations_' + today
+    filename = filename.replace('-', '')
+
+else:
+    filename = args.filename
+
+# Print args
+print({'--data': data, '--variable': args.variable, '--window': args.window,
+       '--method': args.method, '--path': args.path,  '--filename': filename})
+
 # Extract and process data
 try:
-    data = pd.read_csv(args.data, sep='\t')
+    data = pd.read_csv(data, sep=',')
     try:
         data['Date'] = pd.to_datetime(data['Date'])
 
@@ -68,20 +93,20 @@ try:
                 # Pearson
                 if args.method == 'pearson':
                     corr = df.corr(method='pearson')
-                    file_name = os.path.join(args.path, 'correlation.csv')
-                    corr.to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                    file_name = os.path.join(args.path, filename + '.csv')
+                    corr.to_csv(file_name, sep=',', encoding='utf-8', index=True)
 
                 # Kendall
                 elif args.method == 'kendall':
                     corr = df.corr(method='kendall')
-                    file_name = os.path.join(args.path, 'correlation.csv')
-                    corr.to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                    file_name = os.path.join(args.path, filename + '.csv')
+                    corr.to_csv(file_name, sep=',', encoding='utf-8', index=True)
 
                 # Spearman
                 elif args.method == 'spearman':
                     corr = df.corr(method='spearman')
-                    file_name = os.path.join(args.path, 'correlation.csv')
-                    corr.to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                    file_name = os.path.join(args.path, filename + '.csv')
+                    corr.to_csv(file_name, sep=',', encoding='utf-8', index=True)
 
                 # Not allowed
                 elif args.method not in ['pearson', 'kendall', 'spearman']:
@@ -103,20 +128,20 @@ try:
                 # Pearson
                 if args.method == 'pearson':
                     corr = df.corr(method='pearson')
-                    file_name = os.path.join(args.path, 'correlation.csv')
-                    corr.to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                    file_name = os.path.join(args.path, filename + '.csv')
+                    corr.to_csv(file_name, sep=',', encoding='utf-8', index=True)
 
                 # Kendall
                 elif args.method == 'kendall':
                     corr = df.corr(method='kendall')
-                    file_name = os.path.join(args.path, 'correlation.csv')
-                    corr.to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                    file_name = os.path.join(args.path, filename + '.csv')
+                    corr.to_csv(file_name, sep=',', encoding='utf-8', index=True)
 
                 # Spearman
                 elif args.method == 'spearman':
                     corr = df.corr(method='spearman')
-                    file_name = os.path.join(args.path, 'correlation.csv')
-                    corr.to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                    file_name = os.path.join(args.path, filename + '.csv')
+                    corr.to_csv(file_name, sep=',', encoding='utf-8', index=True)
 
                 # Not allowed
                 elif args.method not in ['pearson', 'kendall', 'spearman']:
@@ -148,20 +173,20 @@ try:
                 # Pearson
                 if args.method == 'pearson':
                     corr = df.corr(method='pearson')
-                    file_name = os.path.join(args.path, 'correlation.csv')
-                    corr.to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                    file_name = os.path.join(args.path, filename + '.csv')
+                    corr.to_csv(file_name, sep=',', encoding='utf-8', index=True)
 
                 # Kendall
                 elif args.method == 'kendall':
                     corr = df.corr(method='kendall')
-                    file_name = os.path.join(args.path, 'correlation.csv')
-                    corr.to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                    file_name = os.path.join(args.path, filename + '.csv')
+                    corr.to_csv(file_name, sep=',', encoding='utf-8', index=True)
 
                 # Spearman
                 elif args.method == 'spearman':
                     corr = df.corr(method='spearman')
-                    file_name = os.path.join(args.path, 'correlation.csv')
-                    corr.to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                    file_name = os.path.join(args.path, filename + '.csv')
+                    corr.to_csv(file_name, sep=',', encoding='utf-8', index=True)
 
                 # Not allowed
                 elif args.method not in ['pearson', 'kendall', 'spearman']:
@@ -184,20 +209,20 @@ try:
                 # Pearson
                 if args.method == 'pearson':
                     corr = df.corr(method='pearson')
-                    file_name = os.path.join(args.path, 'correlation.csv')
-                    corr.to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                    file_name = os.path.join(args.path, filename + '.csv')
+                    corr.to_csv(file_name, sep=',', encoding='utf-8', index=True)
 
                 # Kendall
                 elif args.method == 'kendall':
                     corr = df.corr(method='kendall')
-                    file_name = os.path.join(args.path, 'correlation.csv')
-                    corr.to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                    file_name = os.path.join(args.path, filename + '.csv')
+                    corr.to_csv(file_name, sep=',', encoding='utf-8', index=True)
 
                 # Spearman
                 elif args.method == 'spearman':
                     corr = df.corr(method='spearman')
-                    file_name = os.path.join(args.path, 'correlation.csv')
-                    corr.to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                    file_name = os.path.join(args.path, filename + '.csv')
+                    corr.to_csv(file_name, sep=',', encoding='utf-8', index=True)
 
                 # Not allowed
                 elif args.method not in ['pearson', 'kendall', 'spearman']:
@@ -229,20 +254,20 @@ try:
                 # Pearson
                 if args.method == 'pearson':
                     corr = df.corr(method='pearson')
-                    file_name = os.path.join(args.path, 'correlation.csv')
-                    corr.to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                    file_name = os.path.join(args.path, filename + '.csv')
+                    corr.to_csv(file_name, sep=',', encoding='utf-8', index=True)
 
                 # Kendall
                 elif args.method == 'kendall':
                     corr = df.corr(method='kendall')
-                    file_name = os.path.join(args.path, 'correlation.csv')
-                    corr.to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                    file_name = os.path.join(args.path, filename + '.csv')
+                    corr.to_csv(file_name, sep=',', encoding='utf-8', index=True)
 
                 # Spearman
                 elif args.method == 'spearman':
                     corr = df.corr(method='spearman')
-                    file_name = os.path.join(args.path, 'correlation.csv')
-                    corr.to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                    file_name = os.path.join(args.path, filename + '.csv')
+                    corr.to_csv(file_name, sep=',', encoding='utf-8', index=True)
 
                 # Not allowed
                 elif args.method not in ['pearson', 'kendall', 'spearman']:
@@ -265,20 +290,20 @@ try:
                 # Pearson
                 if args.method == 'pearson':
                     corr = df.corr(method='pearson')
-                    file_name = os.path.join(args.path, 'correlation.csv')
-                    corr.to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                    file_name = os.path.join(args.path, filename + '.csv')
+                    corr.to_csv(file_name, sep=',', encoding='utf-8', index=True)
 
                 # Kendall
                 elif args.method == 'kendall':
                     corr = df.corr(method='kendall')
-                    file_name = os.path.join(args.path, 'correlation.csv')
-                    corr.to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                    file_name = os.path.join(args.path, filename + '.csv')
+                    corr.to_csv(file_name, sep=',', encoding='utf-8', index=True)
 
                 # Spearman
                 elif args.method == 'spearman':
                     corr = df.corr(method='spearman')
-                    file_name = os.path.join(args.path, 'correlation.csv')
-                    corr.to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                    file_name = os.path.join(args.path, filename + '.csv')
+                    corr.to_csv(file_name, sep=',', encoding='utf-8', index=True)
 
                 # Not allowed
                 elif args.method not in ['pearson', 'kendall', 'spearman']:

@@ -12,6 +12,7 @@ import argparse
 import sys
 import pandas as pd
 import torch
+from datetime import datetime
 from sklearn.preprocessing import MinMaxScaler
 from pretrain.datasets import DatasetV1
 from torch.utils.data import DataLoader
@@ -33,8 +34,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 parser = argparse.ArgumentParser(description='forecast crypto-coins prices with ML models')
 
 # Test
-parser.add_argument('-ts', '--test', type=str, nargs='?', default=os.path.join(os.getcwd(), 'test.csv'),
-                    help='path to the csv test dataset (default is current directory)')
+parser.add_argument('-ts', '--test', type=str, nargs=1, help='path to the csv test dataset')
 
 # Pretrained
 parser.add_argument('-pt', '--pretrained', type=str, nargs=1, help='path to the pretrained model')
@@ -43,7 +43,7 @@ parser.add_argument('-pt', '--pretrained', type=str, nargs=1, help='path to the 
 parser.add_argument('-t', '--target', type=str, nargs=1, help='target coin to predict (same as pretraining)')
 
 # Features
-parser.add_argument('-f', '--features', type=str, nargs='?',
+parser.add_argument('-ft', '--features', type=str, nargs='?',
                     help='path for json with feature variable list (default are all coins, same as pretraining)')
 
 # Model
@@ -56,6 +56,10 @@ parser.add_argument('-c', '--config', type=str, nargs=1,
 # Path
 parser.add_argument('-p', '--path', type=str, nargs='?', default=os.getcwd(),
                     help='path for saving the predictions (default is current directory)')
+
+# Filename
+parser.add_argument('-f', '--filename', type=str, nargs='?',
+                    help='filename for predictions (default is predictions_model_TODAY)')
 
 # Arg parse
 args = parser.parse_args()
@@ -70,6 +74,11 @@ print('User info: for the prediction phase, always use the same settings of '
 # Exception (invalid path)
 if not (os.path.exists(args.path)):
     print('Invalid path provided: folder does not exist!')
+    sys.exit(1)
+
+# Validate test
+if not args.test:
+    print('Missing argument: --test is required!')
     sys.exit(1)
 
 # Validate target
@@ -96,7 +105,22 @@ if not args.model:
 (target,) = args.target
 (conf,) = args.config
 (mdl,) = args.model
+(test,) = args.test
 (prt,) = args.pretrained
+
+# Validate filename
+if not args.filename:
+    now = datetime.now()
+    today = datetime.strftime(now, '%d-%m-%Y')
+    filename = 'predictions_' + mdl + '_' + today
+    filename = filename.replace('-', '')
+
+else:
+    filename = args.filename
+
+# Print args
+print({'--test': test, '--target': target, '--features': args.features, '--pretrained': prt,
+       '--config': conf, '--model': mdl,  '--path': args.path, '--filename': filename})
 
 # Predict
 try:
@@ -104,7 +128,7 @@ try:
     config = json.load(f)
 
     try:
-        test = pd.read_csv(args.test, sep='\t')
+        test = pd.read_csv(test, sep=',')
 
         try:
             test['Date'] = pd.to_datetime(test['Date'])
@@ -175,8 +199,8 @@ try:
                                     test_pred = pd.DataFrame(test_scaler.inverse_transform(test_pred),
                                                              index=test_pred.index, columns=test_pred.columns)
                                     # Create csv
-                                    file_name = os.path.join(args.path, 'gru_predictions.csv')
-                                    test_pred[target].to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                                    file_name = os.path.join(args.path, filename + '.csv')
+                                    test_pred[target].to_csv(file_name, sep=',', encoding='utf-8', index=True)
                                     print(test_pred[target])
 
                                 # Exception: wrong model
@@ -219,8 +243,8 @@ try:
                                                              index=test_pred.index, columns=test_pred.columns)
 
                                     # Create csv
-                                    file_name = os.path.join(args.path, 'lstm_predictions.csv')
-                                    test_pred[target].to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                                    file_name = os.path.join(args.path, filename + '.csv')
+                                    test_pred[target].to_csv(file_name, sep=',', encoding='utf-8', index=True)
                                     print(test_pred[target])
 
                                 # Exception: wrong model
@@ -254,8 +278,8 @@ try:
                                                              index=test_pred.index, columns=test_pred.columns)
 
                                     # Create csv
-                                    file_name = os.path.join(args.path, 'xgboost_predictions.csv')
-                                    test_pred[target].to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                                    file_name = os.path.join(args.path, filename + '.csv')
+                                    test_pred[target].to_csv(file_name, sep=',', encoding='utf-8', index=True)
                                     print(test_pred[target])
 
                                 # Exception: wrong model
@@ -285,8 +309,8 @@ try:
                                                              index=test_pred.index, columns=test_pred.columns)
 
                                     # Create csv
-                                    file_name = os.path.join(args.path, 'lightgbm_predictions.csv')
-                                    test_pred[target].to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                                    file_name = os.path.join(args.path, filename + '.csv')
+                                    test_pred[target].to_csv(file_name, sep=',', encoding='utf-8', index=True)
                                     print(test_pred[target])
 
                                 # Exception: wrong model
@@ -320,8 +344,8 @@ try:
                                                              index=test_pred.index, columns=test_pred.columns)
 
                                     # Create csv
-                                    file_name = os.path.join(args.path, 'catboost_predictions.csv')
-                                    test_pred[target].to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                                    file_name = os.path.join(args.path, filename + '.csv')
+                                    test_pred[target].to_csv(file_name, sep=',', encoding='utf-8', index=True)
                                     print(test_pred[target])
 
                                 # Exception: wrong model
@@ -389,8 +413,8 @@ try:
                         test_pred = pd.DataFrame(test_scaler.inverse_transform(test_pred),
                                                  index=test_pred.index, columns=test_pred.columns)
                         # Create csv
-                        file_name = os.path.join(args.path, 'gru_predictions.csv')
-                        test_pred[target].to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                        file_name = os.path.join(args.path, filename + '.csv')
+                        test_pred[target].to_csv(file_name, sep=',', encoding='utf-8', index=True)
                         print(test_pred[target])
 
                     # Exception: wrong model
@@ -433,8 +457,8 @@ try:
                                                  index=test_pred.index, columns=test_pred.columns)
 
                         # Create csv
-                        file_name = os.path.join(args.path, 'lstm_predictions.csv')
-                        test_pred[target].to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                        file_name = os.path.join(args.path, filename + '.csv')
+                        test_pred[target].to_csv(file_name, sep=',', encoding='utf-8', index=True)
                         print(test_pred[target])
 
                     # Exception: wrong model
@@ -468,8 +492,8 @@ try:
                                                  index=test_pred.index, columns=test_pred.columns)
 
                         # Create csv
-                        file_name = os.path.join(args.path, 'xgboost_predictions.csv')
-                        test_pred[target].to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                        file_name = os.path.join(args.path, filename + '.csv')
+                        test_pred[target].to_csv(file_name, sep=',', encoding='utf-8', index=True)
                         print(test_pred[target])
 
                     # Exception: wrong model
@@ -499,8 +523,8 @@ try:
                                                  index=test_pred.index, columns=test_pred.columns)
 
                         # Create csv
-                        file_name = os.path.join(args.path, 'lightgbm_predictions.csv')
-                        test_pred[target].to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                        file_name = os.path.join(args.path, filename + '.csv')
+                        test_pred[target].to_csv(file_name, sep=',', encoding='utf-8', index=True)
                         print(test_pred[target])
 
                     # Exception: wrong model
@@ -534,8 +558,8 @@ try:
                                                  index=test_pred.index, columns=test_pred.columns)
 
                         # Create csv
-                        file_name = os.path.join(args.path, 'catboost_predictions.csv')
-                        test_pred[target].to_csv(file_name, sep='\t', encoding='utf-8', index=True)
+                        file_name = os.path.join(args.path, filename + '.csv')
+                        test_pred[target].to_csv(file_name, sep=',', encoding='utf-8', index=True)
                         print(test_pred[target])
 
                     # Exception: wrong model

@@ -25,6 +25,10 @@ parser = argparse.ArgumentParser(description='generate crypto ohlc price dataset
 parser.add_argument('-p', '--path', type=str, nargs='?', default=os.getcwd(),
                     help='path for saving the dataset (default is current directory)')
 
+# Filename
+parser.add_argument('-f', '--filename', type=str, nargs='?',
+                    help='filename for dataset (default is dataset_coinmarketcap_START_END)')
+
 # Coins
 parser.add_argument('-c', '--coins', type=str, nargs='?',
                     help='path for json with coin list (default are top-20 coins)')
@@ -42,6 +46,13 @@ args = parser.parse_args()
 dfs = []
 start = args.start
 end = args.end
+
+# Validate filename
+if not args.filename:
+    filename = 'dataset_coinmarketcap_' + start + '_' + end
+    filename = filename.replace('-', '')
+else:
+    filename = args.filename
 
 # Validate dates
 try:
@@ -69,6 +80,10 @@ try:
 
             try:
                 cryptos = coins['coins']
+
+                # Print args
+                print({'--path': args.path, '--filename': filename,
+                       '--coins': cryptos, '--start': start, '--end': end})
 
                 # Exception (not a list)
                 if not isinstance(cryptos, list):
@@ -110,8 +125,8 @@ try:
                 df_final.reset_index()
 
                 # Create csv
-                file_name = os.path.join(args.path, 'dataset_coinmarketcap.csv')
-                df_final.to_csv(file_name, sep='\t', encoding='utf-8', index=False)
+                file_name = os.path.join(args.path, filename + '.csv')
+                df_final.to_csv(file_name, sep=',', encoding='utf-8', index=False)
 
             # Exception: bad formatted json
             except KeyError:
@@ -132,6 +147,10 @@ try:
     elif not args.coins:
         cryptos = ['btc', 'eth', 'usdt', 'usdc', 'bnb', 'xrp', 'busd', 'ada', 'sol', 'doge', 'matic', 'dot', 'dai', 'shib',
                    'trx', 'avax', 'uni', 'wbtc', 'leo', 'ltc']
+
+        # Print args
+        print({'--path': args.path, '--filename': filename,
+               '--coins': cryptos, '--start': start, '--end': end})
 
         # Scraper
         for crypto in cryptos:
@@ -168,8 +187,8 @@ try:
         df_final.reset_index()
 
         # Create csv
-        file_name = os.path.join(args.path, 'dataset_coinmarketcap.csv')
-        df_final.to_csv(file_name, sep='\t', encoding='utf-8', index=False)
+        file_name = os.path.join(args.path, filename + '.csv')
+        df_final.to_csv(file_name, sep=',', encoding='utf-8', index=False)
 
 # Wrong date format
 except ValueError:
