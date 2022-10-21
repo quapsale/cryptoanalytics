@@ -178,11 +178,6 @@ try:
 
                         # GRU
                         if mdl == 'gru':
-                            if os.path.exists(os.path.join(args.path, filename + '.ckpt')):
-                                print('A file ckpt already exists, please remove the old checkpoint '
-                                      'before storing a new model.')
-                                sys.exit(1)
-
                             train_dataset = DatasetV1(train_scaled, target=target, features=features)
                             validation_dataset = DatasetV1(valid_scaled, target=target, features=features)
 
@@ -223,11 +218,6 @@ try:
 
                         # LSTM
                         elif mdl == 'lstm':
-                            if os.path.exists(os.path.join(args.path, filename + '.ckpt')):
-                                print('A file ckpt already exists, please remove the old checkpoint '
-                                      'before storing a new model.')
-                                sys.exit(1)
-
                             train_dataset = DatasetV1(train, target=target, features=features)
                             validation_dataset = DatasetV1(valid, target=target, features=features)
 
@@ -268,12 +258,6 @@ try:
 
                         # XGBoost
                         elif mdl == 'xgboost':
-
-                            if os.path.exists(os.path.join(args.path, filename + '.txt')):
-                                print('A file .txt already exists, please remove the old checkpoint '
-                                      'before storing a new model.')
-                                sys.exit(1)
-
                             x_train = train.loc[:, train.columns != target]
                             y_train = train[target]
                             x_valid = valid.loc[:, valid.columns != target]
@@ -303,11 +287,6 @@ try:
 
                         # LightGBM
                         elif mdl == 'lightgbm':
-                            if os.path.exists(os.path.join(args.path, filename + '.txt')):
-                                print('A file .txt already exists, please remove the old checkpoint '
-                                      'before storing a new model.')
-                                sys.exit(1)
-
                             x_train = train.loc[:, train.columns != target]
                             y_train = train[target]
                             x_valid = valid.loc[:, valid.columns != target]
@@ -338,11 +317,6 @@ try:
 
                         # Catboost
                         elif mdl == 'catboost':
-                            if os.path.exists(os.path.join(args.path, filename + '.txt')):
-                                print('A file .txt already exists, please remove the old checkpoint '
-                                      'before storing a new model.')
-                                sys.exit(1)
-
                             x_train = train.loc[:, train.columns != target]
                             y_train = train[target]
                             x_valid = valid.loc[:, valid.columns != target]
@@ -401,11 +375,6 @@ try:
 
             # GRU
             if mdl == 'gru':
-                if os.path.exists(os.path.join(args.path, filename + '.ckpt')):
-                    print('A file .ckpt already exists, please remove the old checkpoint '
-                          'before storing a new model.')
-                    sys.exit(1)
-
                 train_dataset = DatasetV1(train_scaled, target=target, features=features)
                 validation_dataset = DatasetV1(valid_scaled, target=target, features=features)
 
@@ -446,11 +415,6 @@ try:
 
             # LSTM
             elif mdl == 'lstm':
-                if os.path.exists(os.path.join(args.path, filename + '.ckpt')):
-                    print('A file .ckpt already exists, please remove the old checkpoint '
-                          'before storing a new model.')
-                    sys.exit(1)
-
                 train_dataset = DatasetV1(train, target=target, features=features)
                 validation_dataset = DatasetV1(valid, target=target, features=features)
 
@@ -491,11 +455,6 @@ try:
 
             # XGBoost
             elif mdl == 'xgboost':
-                if os.path.exists(os.path.join(args.path, filename + '.txt')):
-                    print('A file .txt already exists, please remove the old checkpoint '
-                          'before storing a new model.')
-                    sys.exit(1)
-
                 x_train = train.loc[:, train.columns != target]
                 y_train = train[target]
                 x_valid = valid.loc[:, valid.columns != target]
@@ -525,11 +484,6 @@ try:
 
             # LightGBM
             elif mdl == 'lightgbm':
-                if os.path.exists(os.path.join(args.path, filename + '.txt')):
-                    print('A file .txt already exists, please remove the old checkpoint '
-                          'before storing a new model.')
-                    sys.exit(1)
-
                 x_train = train.loc[:, train.columns != target]
                 y_train = train[target]
                 x_valid = valid.loc[:, valid.columns != target]
@@ -560,11 +514,6 @@ try:
 
             # Catboost
             elif mdl == 'catboost':
-                if os.path.exists(os.path.join(args.path, filename + '.txt')):
-                    print('A file .txt already exists, please remove the old checkpoint '
-                          'before storing a new model.')
-                    sys.exit(1)
-
                 x_train = train.loc[:, train.columns != target]
                 y_train = train[target]
                 x_valid = valid.loc[:, valid.columns != target]
