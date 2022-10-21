@@ -1,6 +1,6 @@
-# CryptoAnalytics (CLI)
+# CryptoAnalytics
 
-CryptoAnalytics (CLI) is a Python Command Line Interface for the analysis and forecasting of financial time series and cryptocurrency price trends.
+CryptoAnalytics is a software artifact for the analysis and forecasting of financial time series and cryptocurrency price trends.
 
 ## Installation
 
@@ -22,17 +22,25 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the pro
 pip install -r requirements.txt
 ```
 
-## CLI Structure
-This CLI is organized as it follows:
+## Structure
+This artifact is organized as it follows:
+
+### Price prediction flow
 
 1. data_pull.py: command to generate a new dataset of OHLC cryptocoin prices from [CoinMarketCap](https://coinmarketcap.com/CoinMarketCap).
-2. correlation_analysis.py: command to analyze correlations among cryptocoin prices.
-3. data_split.py: command to generate train, validation and test sets from the original data.
-4. model_pretrain.py: command to pretrain ML models for cryptocoin prices forecast.
-5. model_forecast.py: command to use the pretrained ML models to forecast cryptocoin prices.
+2. data_split.py: command to generate train, validation and test sets from the original data.
+3. model_pretrain.py: command to pretrain ML models for cryptocoin prices forecast.
+4. model_forecast.py: command to use the pretrained ML models to forecast cryptocoin prices.
+
+### Extra
+
+1. correlation_analysis.py: command to analyze correlations among cryptocoin prices, can be useful for pre-selection of feature variables.
 
 ## Usage
-### Data Pull
+
+### Price prediction flow
+
+#### Data Pull
 
 ```bash
 python data_pull.py -p "destination_path" -f "filename" -c "examples\coins.json" -s "01-01-2020" -e "01-01-2022"
@@ -44,20 +52,7 @@ Args:
 4. -s, --start: starting date for dataset pull, in format %d-%m-%Y (OPTIONAL, defaults to yesterday).
 5. -e, --end: ending date for dataset pull, in format %d-%m-%Y (OPTIONAL, defaults to today).
 
-### Correlation Analysis
-
-```bash
-python correlation_analysis.py -p "destination_path" -f "filename" -d "data_path" -v "avg_ohlc" -w "daily" -m "pearson"
-```
-Args:
-1. -p, --path: destination directory for correlations storage (OPTIONAL, defaults to current directory).
-2. -f, --filename: file name for correlations dataset (OPTIONAL, defaults to correlations_TODAY).
-3. -d, --data: path to .csv file dataset (REQUIRED).
-4. -v, --variable: price variable on which computing correlations, either **avg_ohlc** or **close** (OPTIONAL, defaults to avg_ohlc).
-5. -w, --window: sliding time window to use for computations, either **daily**, **monthly** or **weekly** (OPTIONAL, defaults to daily).
-6. -m, --method: method to compute correlations, either **pearson**, **kendall** or **spearman** (OPTIONAL, defaults to pearson).
-
-### Data Split
+#### Data Split
 
 ```bash
 python data_split.py -p "destination_path" -f "filename1" "filename2" "filename3" -d "data_path" -v "avg_ohlc" -tr 0.8 -vd 0.1 -ts 0.1
@@ -71,7 +66,7 @@ Args:
 6. -vd, --valid: ratio for validation set split (REQUIRED).
 7. -ts, --test: ratio for test set split (REQUIRED).
 
-### Model Pretrain
+#### Model Pretrain
 
 ```bash
 python model_pretrain.py -p "destination_path" -f "filename" -tr "train_path" -vd "valid_path" -t "btc" -ft "examples\features.json" -m "lstm" -c "examples\config_nn.json"
@@ -86,7 +81,7 @@ Args:
 7. -m, --model: model to pretrain for inference, either **lstm**, **gru**, **xgboost**, **lightgbm** or **catboost** (REQUIRED).
 8. -c, --config: path to .json file with list of configs to use for pretraining (REQUIRED).
 
-### Model Forecast
+#### Model Forecast
 
 ```bash
 python model_forecast.py -p "destination_path" -f "filename" -ts "test_path" -pt "pretrained_path" -t "btc" -ft "examples\features.json" -m "lstm" -c "examples\config_nn.json"
@@ -100,6 +95,21 @@ Args:
 6. -ft, --features: path to .json file with list of coins to use as feature/predicting variables, **same as pretraining** (OPTIONAL, defaults to all coins).
 7. -m, --model: model to use for inference, **same as pretraining** (REQUIRED).
 8. -c, --config: path to .json file with list of configs to use for prediction, **same as pretraining** (REQUIRED).
+
+### Extra
+
+#### Correlation Analysis
+
+```bash
+python correlation_analysis.py -p "destination_path" -f "filename" -d "data_path" -v "avg_ohlc" -w "daily" -m "pearson"
+```
+Args:
+1. -p, --path: destination directory for correlations storage (OPTIONAL, defaults to current directory).
+2. -f, --filename: file name for correlations dataset (OPTIONAL, defaults to correlations_TODAY).
+3. -d, --data: path to .csv file dataset (REQUIRED).
+4. -v, --variable: price variable on which computing correlations, either **avg_ohlc** or **close** (OPTIONAL, defaults to avg_ohlc).
+5. -w, --window: sliding time window to use for computations, either **daily**, **monthly** or **weekly** (OPTIONAL, defaults to daily).
+6. -m, --method: method to compute correlations, either **pearson**, **kendall** or **spearman** (OPTIONAL, defaults to pearson).
 
 ## Examples
 You can find examples of coin list (for data pull), configs (for pretraining/forecast) and feature variable list (for pretraining/forecast) in the directory /examples.
