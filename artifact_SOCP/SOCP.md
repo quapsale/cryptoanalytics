@@ -1,6 +1,6 @@
-# CryptoAnalytics-CLI
+# CryptoAnalytics (CLI)
 
-CryptoAnalytics-CLI is a Python Command Line Interface for the analysis and forecasting of financial time series and cryptocurrency price trends.
+CryptoAnalytics (CLI) is a Python Command Line Interface for the analysis and forecasting of financial time series and cryptocurrency price trends.
 
 ## Installation
 
