@@ -36,7 +36,7 @@ parser.add_argument('-p', '--path', type=str, nargs='?', default=os.getcwd(),
                     help='path for saving the splits (default is current directory)')
 
 # Filename
-parser.add_argument('-f', '--filenames', type=list, nargs='+',
+parser.add_argument('-f', '--filenames', nargs='+',
                     help='filenames for dataset splits (defaults are train_TODAY, etc)')
 
 # Arg parse
@@ -85,9 +85,9 @@ else:
         print('Invalid arguments provided: number of filenames is not 3!')
         sys.exit(1)
     filenames = args.filenames
-    (filename_1, ) = filenames[0]
-    (filename_2, ) = filenames[1]
-    (filename_3, ) = filenames[2]
+    filename_1 = filenames[0]
+    filename_2 = filenames[1]
+    filename_3 = filenames[2]
 
 # Print args
 print({'--data': data, '--variable': args.variable, '--train': tr,
