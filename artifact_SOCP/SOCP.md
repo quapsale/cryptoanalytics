@@ -27,7 +27,7 @@ This artifact is organized as it follows:
 
 ### Price prediction flow
 
-1. data_pull.py: command to generate a new dataset of OHLC cryptocoin prices from [CoinMarketCap](https://coinmarketcap.com/CoinMarketCap).
+1. data_pull.py: command to generate a new dataset of OHLC cryptocoin prices from [CoinMarketCap](https://coinmarketcap.com/).
 2. data_split.py: command to generate train, validation and test sets from the original data.
 3. model_pretrain.py: command to pretrain ML models for cryptocoin prices forecast.
 4. model_forecast.py: command to use the pretrained ML models to forecast cryptocoin prices.
