@@ -21,6 +21,18 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the pro
 ```bash
 pip install -r requirements.txt
 ```
+## Demo
+A demo for the price prediction flow of Bitcoin (BTC), using a set of predefined args, is available on CodeOcean.
+
+The demo uses a pre-built dataset (using the data_pull command) with the following characteristics:
+
+1. coins: "btc", "eth", "usdt", "usdc", "bnb", "xrp", "busd", "ada", "sol", "doge", "ltc".
+
+2. start: 01-10-2020.
+
+3. end: 01-10-2022.
+
+To launch the demo, start a reproducible run on our CodeOcean [capsule](https://codeocean.com/capsule/7158163/tree).
 
 ## Structure
 This artifact is organized as it follows:
