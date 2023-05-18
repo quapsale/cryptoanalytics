@@ -1,18 +1,20 @@
 """
 File: lstm.py
 Description: Experiments with LSTM model.
-File Created: 06/04/2022
+File Created: 01/02/2023
 Python Version: 3.9
 """
 
 # Imports
+import os
+import sys
 import numpy as np
 import pandas as pd
 import torch
 from sklearn.preprocessing import MinMaxScaler
-from analysis.forecast.experiments.btc.deep_learning.dataset.datasets import DatasetV1
+from forecast.experiments.btc.deep_learning.dataset.datasets import DatasetV1
 from torch.utils.data import DataLoader
-from analysis.forecast.experiments.btc.deep_learning.models.lstm import LSTM
+from forecast.experiments.btc.deep_learning.models.lstm import LSTM
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 from pytorch_lightning.loggers import CSVLogger
@@ -21,15 +23,17 @@ import datetime
 import csv
 
 # File Properties
-data_path = './data/datasets/binance.csv'
-rnn_path = './analysis/forecast/experiments/btc/deep_learning/'
-predictions_path = './analysis/forecast/experiments/btc/predictions/'
-pretrained_path = './analysis/forecast/experiments/btc/pretrained/'
-checkpoint_path = './analysis/forecast/experiments/btc/checkpoints/'
-logger_path = './analysis/forecast/experiments/btc/loggers/'
-metrics_path = './analysis/forecast/experiments/btc/metrics.csv'
-validation_start = '2022-03-31 07:29:00'
-test_start = '2022-05-11 15:57:00'
+root = sys.path[1]
+os.chdir(root)
+data_path = 'forecast/data/binance.csv'
+rnn_path = 'forecast/experiments/btc/deep_learning/'
+predictions_path = 'forecast/experiments/btc/predictions/'
+pretrained_path = 'forecast/experiments/btc/pretrained/'
+checkpoint_path = 'forecast/experiments/btc/checkpoints/'
+logger_path = 'forecast/experiments/btc/loggers/'
+metrics_path = 'forecast/experiments/btc/metrics.csv'
+validation_start = '2022-07-19 02:05:00'
+test_start = '2022-11-05 13:02:00'
 pl.seed_everything(123)
 batch_size = 256
 num_workers = 16
@@ -38,13 +42,11 @@ num_workers = 16
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Load data
-data = pd.read_csv(data_path, sep='\t', index_col='Date')
+data = pd.read_csv(data_path, sep=',', index_col='Date')
 
 # Drop ETH and alt-coins that don't Granger-cause BTC
 data.drop('ETH', axis=1, inplace=True)
-data.drop('ADA', axis=1, inplace=True)
 data.drop('BNB', axis=1, inplace=True)
-data.drop('XMR', axis=1, inplace=True)
 
 # Split train/validation/test (ratio=80/10/10)
 train = data.loc[:validation_start].copy()
@@ -77,8 +79,8 @@ test_loader = DataLoader(test_dataset, batch_size=1, num_workers=num_workers, sh
 # Experiment Properties
 version = '2'
 learning_rate = 1e-6
-n_layers = 10
-hidden_units = 100
+n_layers = 20
+hidden_units = 200
 n_epochs = 500
 gpus = 1 if torch.cuda.is_available() else 0
 
@@ -104,7 +106,10 @@ lr_finder = trainer.tuner.lr_find(
 )
 learning_rate = lr_finder.suggestion()
 
-# Optimal lr v1: 0.0014
+print(learning_rate)
+
+# Optimal lr v1: 0.0012022644346174128
+# Optimal lr v2: 0.0007413102413009172
 
 # Update model
 model = LSTM(n_features=len(features), hidden_units=hidden_units, n_layers=n_layers, lr=learning_rate)

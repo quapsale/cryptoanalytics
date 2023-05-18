@@ -1,18 +1,20 @@
 """
 File: correlations_monthly_tw.py
-Description: Correlation Analysis with monthly granularity and thumbing window (source: coinmarketcap dataset).
-File Created: 06/01/2022
+Description: Correlation Analysis with monthly granularity and thumbing window (source: raw.csv dataset).
+File Created: 01/01/2023
 Python Version: 3.9
 """
 
 # Imports
+import sys
 import os
 import numpy as np
 import pandas as pd
 
 # File properties
-data_path = './data/datasets/coinmarketcap.csv'
-corr_data_path = './analysis/correlation/correlogram_data'
+root_dir = sys.path[1]
+data_path = os.path.join(root_dir, 'data/datasets/coinmarketcap.csv')
+corr_data_path = os.path.join(root_dir, 'correlation/correlogram_data')
 time_frame = 'M'
 column_names = ['coin', 'x', 'y', 'radius', 'arc_begin', 'arc_end', 'color']
 arc_begin = 0
@@ -20,7 +22,7 @@ arc_end = 360
 color = 1
 
 # Extract btc and eth benchmarks
-data = pd.read_csv(data_path, sep='\t')
+data = pd.read_csv(data_path, sep=',')
 data['Date'] = pd.to_datetime(data['Date'])
 data.drop(['Market Cap', 'Volume'], axis=1, inplace=True)
 data['Avg OHLC Price'] = data[['Open', 'High', 'Low', 'Close']].mean(axis=1)
@@ -87,5 +89,5 @@ corr_data_btc = pd.concat(list_data_btc)
 corr_data_eth = pd.concat(list_data_eth)
 file_name_btc = os.path.join(corr_data_path, 'monthly_tw_btc_OHLC.csv')
 file_name_eth = os.path.join(corr_data_path, 'monthly_tw_eth_OHLC.csv')
-corr_data_btc.to_csv(file_name_btc, sep='\t', encoding='utf-8', index=False)
-corr_data_eth.to_csv(file_name_eth, sep='\t', encoding='utf-8', index=False)
+corr_data_btc.to_csv(file_name_btc, sep=',', encoding='utf-8', index=False)
+corr_data_eth.to_csv(file_name_eth, sep=',', encoding='utf-8', index=False)

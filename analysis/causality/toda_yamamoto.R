@@ -1,6 +1,6 @@
 # File: toda_yamamoto.R
 # Description: Implementation of the Toda-Yamamoto (1995) procedure to test for Granger causality.
-# File Created: 01/07/2022
+# File Created: 01/02/2023
 # R Version: 3.6
 
 
@@ -14,25 +14,29 @@ library(zoo)
 library(tseries)
 
 # File properties
-data_path <- './data/datasets/binance.csv'
+wd <- getwd()
+data_path <- file.path(wd, 'data/binance_notest.csv')
 
 # Set seed
-set.seed(123)
+set.seed(1234)
 
 # Load data
-data <- read_delim(data_path, delim = '\t')
-coins <- names(data[, 2:16])
+data <- read_delim(data_path, delim = ',')
+coins <- names(data[, 2:17])
 
 # Transform into daily observations
 daily_freq <- as.Date(cut(data$Date, 'day'))
-new_data <- aggregate(ADA ~ daily_freq, data, mean)
-colnames(new_data) <- c('Date', 'ADA')
+new_data <- aggregate(DOGE ~ daily_freq, data, mean)
+colnames(new_data) <- c('Date', 'XLM')
 
-for (i in coins[2:15])
+for (i in coins[2:16])
 { coin <- aggregate(data[[i]] ~ daily_freq, data, mean)
   colnames(coin) <- c('Date', i)
   new_data <- cbind(new_data, coin[2])
 }
+
+# Write output
+sink('results/output.txt')
 
 # ADF test
 for (i in coins)
@@ -65,7 +69,7 @@ for (i in coins)
 # 1st order differentiation eliminates the unit root, then the maximum order of integration is 1.
 
 # Set up VAR select using all the possible coin pairs to find optimal lag (lower AIC)
-coins_subset <- coins[-c(3, 6)]
+coins_subset <- coins[-c(3, 5)]
 btc_lags <- c()
 eth_lags <- c()
 
@@ -95,11 +99,6 @@ V <- VAR(new_data[c('BTC', i)], p=lag+1, type='both')
 waldtest1 <- wald.test(b=coef(V$varresult[[1]]), Sigma=vcov(V$varresult[[1]]), Terms=c(seq(2, by=2, length=lag)))
 cat(i, 'does not Granger-cause BTC', '\n')
 print(waldtest1$result)
-
-# Wald-test 2 (H0: BTC does not Granger-cause alt-coin)
-waldtest2 <- wald.test(b=coef(V$varresult[[2]]), Sigma=vcov(V$varresult[[2]]), Terms=c(seq(1, by=2, length=lag)))
-cat('BTC does not Granger-cause', i, '\n')
-print(waldtest2$result)
 }
 
 # ETH
@@ -113,10 +112,8 @@ V <- VAR(new_data[c('ETH', i)], p=lag+1, type='both')
 # Wald-test 1 (H0: alt-coin does not Granger-cause ETH)
 waldtest1 <- wald.test(b=coef(V$varresult[[1]]), Sigma=vcov(V$varresult[[1]]), Terms=c(seq(2, by=2, length=lag)))
 cat(i, 'does not Granger-cause ETH', '\n')
-print(waldtest1$result) 
-
-# Wald-test 2 (H0: ETH does not Granger-cause alt-coin)
-waldtest2 <- wald.test(b=coef(V$varresult[[2]]), Sigma=vcov(V$varresult[[2]]), Terms=c(seq(1, by=2, length=lag)))
-cat('ETH does not Granger-cause', i, '\n')
-print(waldtest2$result)
+print(waldtest1$result)
 }
+
+# Stop writing output
+sink()
