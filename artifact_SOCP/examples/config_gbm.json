@@ -1,6 +1,0 @@
-{
-  "seed": 1234,
-  "learning_rate": 1e-2,
-  "n_trees": 100,
-  "patience": 20
-}
