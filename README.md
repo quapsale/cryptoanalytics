@@ -1,6 +1,6 @@
-# CryptoAnalytics
+# Cryptocoins Analytics
 
-CryptoAnalytics is a Python and R project for the analysis and forecasting of financial time series and cryptocurrency price trends.
+Cryptocoins Analytics is a Python and R project for the analysis and forecasting of financial time series and cryptocurrency price trends.
 
 ## Project Structure
 This repository is organized as it follows:
