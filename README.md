@@ -27,7 +27,6 @@ Valerio Schiavoni, University of Neuchâtel, [valerio.schiavoni@unine.ch](mailto
 ## References
 <li> <i> Pasquale De Rosa, Pascal Felber and Valerio Schiavoni. 2023. Practical Forecasting of Cryptocoins Timeseries using Correlation Patterns. In: Proceedings of the 17th ACM International Conference on Distributed and Event-based Systems. DEBS 2023. https://doi.org/10.1145/3583678.3596888. </i></li>
 
-
 <li> <i> Pasquale De Rosa and Valerio Schiavoni. 2022. Understanding Cryptocoins Trends Correlations. In: Distributed Applications and Interoperable Systems. DAIS 2022. https://doi.org/10.1007/978-3-031-16092-9_3. </i></li>
 
 ## License
